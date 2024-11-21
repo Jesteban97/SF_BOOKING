@@ -1,5 +1,5 @@
 'use client'
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from 'primereact/button';
 import { PiAirplaneTakeoffFill } from "react-icons/pi";
@@ -20,19 +20,26 @@ interface Passenger {
     email: string;
     idPasajero?: string;
 }
-
+interface PassengerResponse {
+    nombrePasajero: string;
+    apellidoPasajero: string;
+    tipoDocumento: string;
+    numeroDocumento: string;
+    telefonoContacto: string;
+    correoContacto: string;
+    idPasajero?: string;
+}
 const Booking = () => {
     const params = useParams();
     const router = useRouter();
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
     const [passengers, setPassengers] = useState<Passenger[]>([]);
-    const [preferences, setPreferences] = useState<string[]>([]);
     const [origin, setOrigin] = useState<string>("");
     const [destination, setDestination] = useState<string>("");
     const [dateStart, setDateStart] = useState<Date | null>(null);
     const [dateEnd, setDateEnd] = useState<Date | null>(null);
-    const [reservationId, setReservationId] = useState<any>(params.id);
+    const [reservationId, setReservationId] = useState<string | string[] | undefined>(params.id);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -41,19 +48,19 @@ const Booking = () => {
         }
     }, [reservationId]);  // Se ejecuta cuando reservationId cambia
 
-    const fetchReservation = async (id: string) => {
+    const fetchReservation = async (id: string | string[] | undefined) => {
         try {
             const reservation = await consultarReserva(id);
             console.log(reservation.consultarReserva)  // Se realiza la consulta aquí
             setPhone(reservation.consultarReserva.telefonoContacto.toString());
             setEmail(reservation.consultarReserva.correoContacto);
-            setPassengers(reservation.consultarReserva.pasajeros.map((p: any) => ({
+            setPassengers(reservation.consultarReserva.pasajeros.map((p: PassengerResponse) => ({
                 name: p.nombrePasajero,
                 surname: p.apellidoPasajero,
                 documentType: p.tipoDocumento,
                 document: p.numeroDocumento,
                 phone: p.telefonoContacto,
-                email: p.correoContacto
+                email: p.correoContacto,
             })));
             setOrigin("Origen desconocido"); // Ajustar según datos de reserva
             setDestination("Destino desconocido"); // Ajustar según datos de reserva
@@ -109,7 +116,7 @@ const Booking = () => {
         try {
             await cancelarReserva(reservationId);
             alert(`Reserva con ID ${reservationId} cancelada.`);
-            setReservationId(null);
+            setReservationId("");
             router.push('/BookingSearch');
         } catch (error) {
             alert("Error al cancelar la reserva.");

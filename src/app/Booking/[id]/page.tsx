@@ -79,17 +79,7 @@ const Booking = () => {
                 // Editar reserva
                 await editarPasajeros({
                     idReserva: reservationId,
-                    telefonoContacto: parseInt(phone, 10),
-                    correoContacto: email,
-                    pasajeros: passengers.map(p => ({
-                        idPasajero: p.idPasajero,
-                        nombrePasajero: p.name,
-                        apellidoPasajero: p.surname,
-                        tipoDocumento: p.documentType,
-                        numeroDocumento: p.document,
-                        telefonoContacto: p.phone,
-                        correoContacto: p.email
-                    })),
+                    pasajeros: [],
                 });
                 await editarContactoReserva({
                     idReserva: reservationId,
